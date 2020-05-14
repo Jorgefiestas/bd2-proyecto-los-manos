@@ -1,4 +1,4 @@
-#include "../include/bptree.hpp"
+#include <bplus/bptree.hpp>
 #include <optional>
 
 template <class T, int BTREE_ORDER>

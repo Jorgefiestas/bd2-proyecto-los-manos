@@ -140,32 +140,59 @@ test_1/fast:
 	$(MAKE) -f CMakeFiles/test_1.dir/build.make CMakeFiles/test_1.dir/build
 .PHONY : test_1/fast
 
-src/bptree.o: src/bptree.cpp.o
+src/bptree/bptree.o: src/bptree/bptree.cpp.o
 
-.PHONY : src/bptree.o
+.PHONY : src/bptree/bptree.o
 
 # target to build an object file
-src/bptree.cpp.o:
-	$(MAKE) -f CMakeFiles/test_1.dir/build.make CMakeFiles/test_1.dir/src/bptree.cpp.o
-.PHONY : src/bptree.cpp.o
+src/bptree/bptree.cpp.o:
+	$(MAKE) -f CMakeFiles/test_1.dir/build.make CMakeFiles/test_1.dir/src/bptree/bptree.cpp.o
+.PHONY : src/bptree/bptree.cpp.o
 
-src/bptree.i: src/bptree.cpp.i
+src/bptree/bptree.i: src/bptree/bptree.cpp.i
 
-.PHONY : src/bptree.i
+.PHONY : src/bptree/bptree.i
 
 # target to preprocess a source file
-src/bptree.cpp.i:
-	$(MAKE) -f CMakeFiles/test_1.dir/build.make CMakeFiles/test_1.dir/src/bptree.cpp.i
-.PHONY : src/bptree.cpp.i
+src/bptree/bptree.cpp.i:
+	$(MAKE) -f CMakeFiles/test_1.dir/build.make CMakeFiles/test_1.dir/src/bptree/bptree.cpp.i
+.PHONY : src/bptree/bptree.cpp.i
 
-src/bptree.s: src/bptree.cpp.s
+src/bptree/bptree.s: src/bptree/bptree.cpp.s
 
-.PHONY : src/bptree.s
+.PHONY : src/bptree/bptree.s
 
 # target to generate assembly for a file
-src/bptree.cpp.s:
-	$(MAKE) -f CMakeFiles/test_1.dir/build.make CMakeFiles/test_1.dir/src/bptree.cpp.s
-.PHONY : src/bptree.cpp.s
+src/bptree/bptree.cpp.s:
+	$(MAKE) -f CMakeFiles/test_1.dir/build.make CMakeFiles/test_1.dir/src/bptree/bptree.cpp.s
+.PHONY : src/bptree/bptree.cpp.s
+
+src/bptree/pagemanager.o: src/bptree/pagemanager.cpp.o
+
+.PHONY : src/bptree/pagemanager.o
+
+# target to build an object file
+src/bptree/pagemanager.cpp.o:
+	$(MAKE) -f CMakeFiles/test_1.dir/build.make CMakeFiles/test_1.dir/src/bptree/pagemanager.cpp.o
+.PHONY : src/bptree/pagemanager.cpp.o
+
+src/bptree/pagemanager.i: src/bptree/pagemanager.cpp.i
+
+.PHONY : src/bptree/pagemanager.i
+
+# target to preprocess a source file
+src/bptree/pagemanager.cpp.i:
+	$(MAKE) -f CMakeFiles/test_1.dir/build.make CMakeFiles/test_1.dir/src/bptree/pagemanager.cpp.i
+.PHONY : src/bptree/pagemanager.cpp.i
+
+src/bptree/pagemanager.s: src/bptree/pagemanager.cpp.s
+
+.PHONY : src/bptree/pagemanager.s
+
+# target to generate assembly for a file
+src/bptree/pagemanager.cpp.s:
+	$(MAKE) -f CMakeFiles/test_1.dir/build.make CMakeFiles/test_1.dir/src/bptree/pagemanager.cpp.s
+.PHONY : src/bptree/pagemanager.cpp.s
 
 src/main.o: src/main.cpp.o
 
@@ -194,32 +221,32 @@ src/main.cpp.s:
 	$(MAKE) -f CMakeFiles/test_1.dir/build.make CMakeFiles/test_1.dir/src/main.cpp.s
 .PHONY : src/main.cpp.s
 
-src/pagemanager.o: src/pagemanager.cpp.o
+src/random_file/random_file.o: src/random_file/random_file.cpp.o
 
-.PHONY : src/pagemanager.o
+.PHONY : src/random_file/random_file.o
 
 # target to build an object file
-src/pagemanager.cpp.o:
-	$(MAKE) -f CMakeFiles/test_1.dir/build.make CMakeFiles/test_1.dir/src/pagemanager.cpp.o
-.PHONY : src/pagemanager.cpp.o
+src/random_file/random_file.cpp.o:
+	$(MAKE) -f CMakeFiles/test_1.dir/build.make CMakeFiles/test_1.dir/src/random_file/random_file.cpp.o
+.PHONY : src/random_file/random_file.cpp.o
 
-src/pagemanager.i: src/pagemanager.cpp.i
+src/random_file/random_file.i: src/random_file/random_file.cpp.i
 
-.PHONY : src/pagemanager.i
+.PHONY : src/random_file/random_file.i
 
 # target to preprocess a source file
-src/pagemanager.cpp.i:
-	$(MAKE) -f CMakeFiles/test_1.dir/build.make CMakeFiles/test_1.dir/src/pagemanager.cpp.i
-.PHONY : src/pagemanager.cpp.i
+src/random_file/random_file.cpp.i:
+	$(MAKE) -f CMakeFiles/test_1.dir/build.make CMakeFiles/test_1.dir/src/random_file/random_file.cpp.i
+.PHONY : src/random_file/random_file.cpp.i
 
-src/pagemanager.s: src/pagemanager.cpp.s
+src/random_file/random_file.s: src/random_file/random_file.cpp.s
 
-.PHONY : src/pagemanager.s
+.PHONY : src/random_file/random_file.s
 
 # target to generate assembly for a file
-src/pagemanager.cpp.s:
-	$(MAKE) -f CMakeFiles/test_1.dir/build.make CMakeFiles/test_1.dir/src/pagemanager.cpp.s
-.PHONY : src/pagemanager.cpp.s
+src/random_file/random_file.cpp.s:
+	$(MAKE) -f CMakeFiles/test_1.dir/build.make CMakeFiles/test_1.dir/src/random_file/random_file.cpp.s
+.PHONY : src/random_file/random_file.cpp.s
 
 # Help Target
 help:
@@ -230,15 +257,18 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... test_1"
-	@echo "... src/bptree.o"
-	@echo "... src/bptree.i"
-	@echo "... src/bptree.s"
+	@echo "... src/bptree/bptree.o"
+	@echo "... src/bptree/bptree.i"
+	@echo "... src/bptree/bptree.s"
+	@echo "... src/bptree/pagemanager.o"
+	@echo "... src/bptree/pagemanager.i"
+	@echo "... src/bptree/pagemanager.s"
 	@echo "... src/main.o"
 	@echo "... src/main.i"
 	@echo "... src/main.s"
-	@echo "... src/pagemanager.o"
-	@echo "... src/pagemanager.i"
-	@echo "... src/pagemanager.s"
+	@echo "... src/random_file/random_file.o"
+	@echo "... src/random_file/random_file.i"
+	@echo "... src/random_file/random_file.s"
 .PHONY : help
 
 

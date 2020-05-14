@@ -1,4 +1,5 @@
-#include "../include/bptree.hpp"
+#include <bplus/bptree.hpp>
+#include <random_file/random_file.hpp>
 
 int main(){
 

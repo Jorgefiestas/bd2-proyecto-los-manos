@@ -1,4 +1,4 @@
-#include "../include/pagemanager.hpp"
+#include <bplus/pagemanager.hpp>
 
 pagemanager::pagemanager(std::string file_name, bool trunc): 
 	std::fstream(file_name.data(), std::ios::in | std::ios::out | std::ios::binary) {
