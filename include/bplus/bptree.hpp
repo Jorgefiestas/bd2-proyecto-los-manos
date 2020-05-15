@@ -83,7 +83,7 @@ public:
 	void split(node &parent, int pos);
 	void split_root();
 
-	iterator find(const T &value);
+	iterator search(const T &value);
 	iterator find(node &ptr, const T &value);
 
 	std::optional<node> find_node(const T &value);
@@ -245,7 +245,8 @@ void btree<T, BTREE_ORDER>::split(node &parent, int pos) {
 	write_node(right.page_id, right);
 }
 
-template <class T, int BTREE_ORDER> void btree<T, BTREE_ORDER>::split_root() {
+template <class T, int BTREE_ORDER>
+void btree<T, BTREE_ORDER>::split_root() {
 	node ptr = this->read_node(this->header.root_id);
 	node left = this->new_node();
 	node right = this->new_node();
@@ -365,7 +366,7 @@ typename btree<T, BTREE_ORDER>::iterator btree<T, BTREE_ORDER>::end() {
 }
 template <class T, int BTREE_ORDER>
 typename btree<T, BTREE_ORDER>::iterator
-btree<T, BTREE_ORDER>::find(const T &value) {
+btree<T, BTREE_ORDER>::search(const T &value) {
 	node root = read_node(header.root_id);
 	return find(root, value);
 }

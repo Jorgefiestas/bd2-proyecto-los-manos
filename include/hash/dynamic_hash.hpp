@@ -146,7 +146,7 @@ std::optional<T> DinHash<T, fd>::search(int key) {
 		if (!index.count(key & make_mask(hash))) continue;
 
 		Bucket b = read_bucket(hash);
-		return b->search(key);
+		return b.search(key);
 	}
 }
 
