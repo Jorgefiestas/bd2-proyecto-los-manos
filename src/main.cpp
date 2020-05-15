@@ -74,7 +74,12 @@ void btree_test(std::vector<Person> &vec) {
 	}
 }
 
-void insert_dyn_hash(const std::string& dataset1) {
+void insert_dyn_hash_test(std::vector<Person> &vec) {
+	DinHash<Person, 10> dhash(5, "data_hash.bin");
+
+	for(Person &p : vec) {
+		dhash.insert(p.dni, p);
+	}
 }
 
 void insert_random_file_test(std::vector<Person> vec) {
@@ -118,5 +123,11 @@ int main() {
 	auto duration_2 = std::chrono::duration_cast<std::chrono::milliseconds>(end_2 - start_2).count();
 	std::cout << "Random File took "	<< duration_2 << "ms" << std::endl;
 
+	//Time for DynamicHash
+	auto start_3 = std::chrono::steady_clock::now();
+	insert_dyn_hash_test(test_registers);
+	auto end_3 = std::chrono::steady_clock::now();
+	auto duration_3 = std::chrono::duration_cast<std::chrono::milliseconds>(end_3 - start_3).count();
+	std::cout << "Dynamic hash took "  << duration_3 << "ms" << std::endl;
 	return 0; 
 }

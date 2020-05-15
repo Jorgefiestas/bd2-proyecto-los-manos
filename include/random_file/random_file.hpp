@@ -122,7 +122,6 @@ void RandomFile<T>::save_index(){
 			index_stream.write((char*)&rec, sizeof(decltype(rec)));});
 	index_stream.close();
 }
-template <class T>
-RandomFile<T>::~RandomFile(){
+template <class T> RandomFile<T>::~RandomFile(){
 	save_index();
 }
