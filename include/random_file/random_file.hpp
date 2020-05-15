@@ -22,11 +22,10 @@ class RandomFile {
   };
 	private:
 		struct RandomIndex {
-			struct IndexRecord { char* key;int pos;};
+			struct IndexRecord { int key;int pos;};
 			std::vector<IndexRecord> index_list;
-			RandomIndex(){
-				//TODO load
-			};
+			RandomIndex(){}
+			RandomIndex(const std::string& index_file);
 			RandomIndex(RandomIndex& ind) = delete;
 			RandomIndex& operator=(RandomIndex& ind) = delete;
 
@@ -39,7 +38,7 @@ class RandomFile {
 		void load_index();
 
 	public:
-		RandomFile(std::string main_name, std::string index_name) : main_name(main_name), index_name(index_name){}
+		RandomFile(std::string main_name, std::string index_name) : main_name(main_name), index_name(index_name){load_index();}
 		FileResponse add(T record);
 		FileResponse search(char* key);
 		~RandomFile();
@@ -49,17 +48,47 @@ class RandomFile {
 namespace fs = std::filesystem;
 
 template <class T>
+RandomFile<T>::RandomIndex::RandomIndex(const std::string& index_file){
+	if (not fs::exists(fs::path(index_file)))
+		return;
+	std::ifstream idx_stream(index_file, std::ios::binary);
+	while(not idx_stream.eof()){
+		int key, pos;	
+		idx_stream.read((char*)&key, sizeof(int));
+		idx_stream.read((char*)&pos, sizeof(int));
+		idx_stream.get();
+		IndexRecord r {.key = key, .pos = pos};
+		index_list.push_back(r);
+	}
+}
+
+template <class T>
 typename RandomFile<T>::FileResponse RandomFile<T>::add(T record){
-	std::size_t main_size = fs::file_size(fs::path(main_name));	
-	std::ofstream main_stream(main_name, std::ios::out | std::ios::binary);
+	typename RandomFile::RandomIndex::IndexRecord idx_rec{};
+	if (fs::exists(fs::path(main_name))){
+		std::size_t main_size = fs::file_size(fs::path(main_name));	
+		std::ofstream main_stream(main_name, std::ios::out | std::ios::binary);
 
-	typename RandomFile::RandomIndex::IndexRecord idx_rec {.key = record.codigo, .pos = main_size / sizeof(T)};
-	main_stream.seekp(0, std::ios::end);
-	main_stream.write((char*)&record, sizeof(T));
-	index->index_list.push_back(idx_rec);							
+		idx_rec.key = record.dni;
+		idx_rec.pos = main_size / sizeof(T);
 
-	main_stream.close();
-	FileResponse res {.code = ResponseCode::success, .pos = idx_rec.pos};
+		main_stream.seekp(0, std::ios::end);
+		main_stream.write((char*)&record, sizeof(T));
+		index->index_list.push_back(idx_rec);							
+		main_stream.close();
+	} else {
+		std::ofstream main_stream(main_name, std::ios::out | std::ios::binary | std::ios::trunc);
+
+		idx_rec.key = record.dni;
+		idx_rec.pos = 0;
+
+		main_stream.write((char*)&record, sizeof(T));
+		index->index_list.push_back(idx_rec);
+		main_stream.close();
+	}
+
+
+	FileResponse res {.code = ResponseCode::SUCCESS, .pos = idx_rec.pos};
 	return res;
 }
 
@@ -77,7 +106,7 @@ typename RandomFile<T>::FileResponse RandomFile<T>::search(char* key){
 	T obj;
 	main_stream.seekg((*it).pos * sizeof(T), std::ios::beg);
 	main_stream.read((char*)&obj, sizeof(T));
-	FileResponse res{.code = ResponseCode::success, .pos = (*it).pos, .record = std::make_optional(obj)}; 
+	FileResponse res{.code = ResponseCode::SUCCESS, .pos = (*it).pos, .record = std::make_optional(obj)}; 
 	return res;
 }
 
