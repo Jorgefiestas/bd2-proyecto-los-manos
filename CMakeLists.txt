@@ -4,12 +4,9 @@ project(bd2 C CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
+include_directories(include)
+set(SOURCES src/main.cpp)
 
-find_package(Threads)
+add_executable(${PROJECT_NAME} ${SOURCES})
 
-include_directories(./include)
-set(SOURCES src/bptree/bptree.cpp src/bptree/pagemanager.cpp src/random_file/random_file.cpp
-	src/hash/dynamic_hash.cpp src/main.cpp)
-
-add_executable(test_1 ${SOURCES})
 
