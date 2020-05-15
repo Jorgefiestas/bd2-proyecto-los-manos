@@ -1,0 +1,10 @@
+CMake*
+Makefile
+cmake*
+
+build
+
+*.out
+*.exe
+*.o
+bd2

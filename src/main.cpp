@@ -60,9 +60,24 @@ void btree_test(const std::string& dataset1, const std::string& dataset2) {
 	//TODO LOAD FILE WITH DATA	
 	//TODO INSERT IN TREE	
 }
+<<<<<<< HEAD
 void insert_dyn_hash() {}
 
 void insert_random_file() {}
+=======
+void insert_dyn_hash(const std::string& dataset1) {
+}
+void insert_random_file_test(const std::string& dataset1) {
+	RandomFile<Person> rf("data_rf.bin", "index_rf.bin");
+	std::ifstream stream_1(dataset1);
+
+	Person tmp;
+	while(not stream_1.eof()){
+		stream_1 >> tmp;
+		rf.add(tmp);
+	}
+}
+>>>>>>> 5a36993aab1ef1eac9e68ee83308e4c9bfbec1aa
 
 int main() {
 	const std::string data_1 = "generator/register-dataset.txt";
@@ -74,7 +89,14 @@ int main() {
 	btree_test(data_1, data_2);
 	auto end = std::chrono::steady_clock::now();
 	auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
-	std::cout << "Took "  << duration << "ms" << std::endl;
+	std::cout << "B+ Tree took "  << duration << "ms" << std::endl;
+
+	//Time for RandomFile
+	auto start_2 = std::chrono::steady_clock::now();
+	insert_random_file_test(data_1);
+	auto end_2 = std::chrono::steady_clock::now();
+	auto duration_2 = std::chrono::duration_cast<std::chrono::milliseconds>(end_2 - start_2).count();
+	std::cout << "Random File took "  << duration_2 << "ms" << std::endl;
 
 	return 0; 
 }
