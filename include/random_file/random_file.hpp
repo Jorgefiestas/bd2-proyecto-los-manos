@@ -45,14 +45,9 @@ class RandomFile {
 };
 #endif
 
-size_t file_size(const std::string& filename) {
-	std::ifstream in(filename, std::ifstream::ate | std::ifstream::binary);
-	return in.tellg();
-}
-
-bool file_exists(constconst  std::string& filename) {
+bool file_exists(const std::string& filename) {
 	struct stat buffer;
-	return (stat (name.c_str(), &buffer) == 0);
+	return (stat (filename.c_str(), &buffer) == 0);
 }
 
 template <class T>
@@ -73,14 +68,13 @@ RandomFile<T>::RandomIndex::RandomIndex(const std::string& index_file){
 template <class T>
 typename RandomFile<T>::FileResponse RandomFile<T>::add(T record){
 	typename RandomFile::RandomIndex::IndexRecord idx_rec{};
-	if (exists(main_name)){
-		std::size_t main_size = file_size(main_name);	
-		std::ofstream main_stream(main_name, std::ios::out | std::ios::binary);
+	if (file_exists(main_name)){
+		std::ofstream main_stream(main_name, std::ios_base::app | std::ios::binary);
+		std::size_t main_size = main_stream.tellp();	
 
 		idx_rec.key = record.dni;
 		idx_rec.pos = main_size / sizeof(T);
 
-		main_stream.seekp(0, std::ios::end);
 		main_stream.write((char*)&record, sizeof(T));
 		index->index_list.push_back(idx_rec);							
 		main_stream.close();
