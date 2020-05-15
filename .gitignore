@@ -1,0 +1,14 @@
+CMake*
+Makefile
+cmake*
+
+build
+
+*.swp
+
+*.bin
+
+*.out
+*.exe
+*.o
+bd2

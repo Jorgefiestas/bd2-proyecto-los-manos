@@ -20,9 +20,9 @@ template <class T, int fd> struct BaseBucket {
   int depth;
   int size;
 
-  BaseBucket(int depth, int size);
-  int insert(int key, T obj, bool force);
-  std::optional<T> search(int key);
+	BaseBucket(int depth, int size);
+	int insert(int key, T obj, bool force);
+	std::optional<T> search(int key);
 };
 
 template <class T, int fd = 2> class DinHash {
@@ -55,14 +55,14 @@ public:
     in_stream.read((char *)&current_depth, sizeof(int));
   }
 
-  void insert(int key, T obj);
-  std::optional<T> search(int key);
-  bool split_bucket(int hash, const T &obj);
+		void insert(int key, T obj);
+		std::optional<T> search(int key);
+		bool split_bucket(int hash, const T &obj);
 };
-#endif
+
 template <class T, int fd> BaseBucket<T, fd>::BaseBucket(int depth, int size) {
-  depth = depth;
-  size = size;
+	depth = depth;
+	size = size;
 }
 
 template <class T, int fd>
@@ -75,13 +75,14 @@ int BaseBucket<T, fd>::insert(int key, T obj, bool force) {
   }
   values[key] = obj;
   return 1;
+
 }
 template <class T, int fd> std::optional<T> BaseBucket<T, fd>::search(int key) {
 
-  auto it = values.find(key);
-  if (it != values.end())
-    return std::make_optional(values[key]);
-  return std::nullopt;
+	auto it = values.find(key);
+	if (it != values.end())
+		return std::make_optional(values[key]);
+	return std::nullopt;
 }
 // Dynamic Hash
 
@@ -123,10 +124,12 @@ bool DinHash<T, fd>::split_bucket(int hash, const T &obj) {
   }
   buck->depth++;
 
-  // Copy values from bucket and clear
-  auto vec_copy = buck->values.copy();
-  vec_copy[hash] = obj;
-  buck->values.clear();
+
+	// Copy values from bucket and clear
+	auto vec_copy = buck->values.copy();
+	vec_copy[hash] = obj;
+	buck->values.clear();
+
 
   // Create new buckets if they don't exist
   if (current_depth != buck->depth) {
@@ -147,4 +150,7 @@ bool DinHash<T, fd>::split_bucket(int hash, const T &obj) {
 		write_bucket(k,  b);
   }
   return true;
+
 }
+
+#endif

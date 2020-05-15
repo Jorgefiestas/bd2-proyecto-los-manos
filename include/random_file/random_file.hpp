@@ -1,6 +1,7 @@
 #ifndef RANDOM_FILE_HPP
 #define RANDOM_FILE_HPP
 
+#include <sys/stat.h>
 #include <fstream>
 #include <functional>
 #include <iostream>
@@ -9,7 +10,6 @@
 #include <string>
 #include <vector>
 #include <algorithm>
-#include <filesystem>
 
 template <class T>
 class RandomFile {
@@ -45,11 +45,14 @@ class RandomFile {
 };
 #endif
 
-namespace fs = std::filesystem;
+bool file_exists(const std::string& filename) {
+	struct stat buffer;
+	return (stat (filename.c_str(), &buffer) == 0);
+}
 
 template <class T>
 RandomFile<T>::RandomIndex::RandomIndex(const std::string& index_file){
-	if (not fs::exists(fs::path(index_file)))
+	if (not file_exists(index_file))
 		return;
 	std::ifstream idx_stream(index_file, std::ios::binary);
 	while(not idx_stream.eof()){
@@ -65,14 +68,13 @@ RandomFile<T>::RandomIndex::RandomIndex(const std::string& index_file){
 template <class T>
 typename RandomFile<T>::FileResponse RandomFile<T>::add(T record){
 	typename RandomFile::RandomIndex::IndexRecord idx_rec{};
-	if (fs::exists(fs::path(main_name))){
-		std::size_t main_size = fs::file_size(fs::path(main_name));	
-		std::ofstream main_stream(main_name, std::ios::out | std::ios::binary);
+	if (file_exists(main_name)){
+		std::ofstream main_stream(main_name, std::ios_base::app | std::ios::binary);
+		std::size_t main_size = main_stream.tellp();	
 
 		idx_rec.key = record.dni;
 		idx_rec.pos = main_size / sizeof(T);
 
-		main_stream.seekp(0, std::ios::end);
 		main_stream.write((char*)&record, sizeof(T));
 		index->index_list.push_back(idx_rec);							
 		main_stream.close();
@@ -86,7 +88,6 @@ typename RandomFile<T>::FileResponse RandomFile<T>::add(T record){
 		index->index_list.push_back(idx_rec);
 		main_stream.close();
 	}
-
 
 	FileResponse res {.code = ResponseCode::SUCCESS, .pos = idx_rec.pos};
 	return res;
