@@ -9,7 +9,6 @@
 #include <string>
 #include <vector>
 #include <algorithm>
-#include <filesystem>
 
 template <class T>
 class RandomFile {
@@ -46,11 +45,15 @@ class RandomFile {
 };
 #endif
 
-namespace fs = std::filesystem;
+size_t file_size(std::string filename) {
+	std::cout << "HERE" << std::endl;
+	std::ifstream in(filename, std::ifstream::ate | std::ifstream::binary);
+	return in.tellg();
+}
 
 template <class T>
 typename RandomFile<T>::FileResponse RandomFile<T>::add(T record){
-	std::size_t main_size = fs::file_size(fs::path(main_name));	
+	std::size_t main_size = file_size(main_name);	
 	std::ofstream main_stream(main_name, std::ios::out | std::ios::binary);
 
 	typename RandomFile::RandomIndex::IndexRecord idx_rec {.key = record.codigo, .pos = main_size / sizeof(T)};

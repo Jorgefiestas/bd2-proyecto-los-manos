@@ -50,25 +50,23 @@ void btree_test(const std::string& dataset1, const std::string& dataset2) {
 	btree<Person> tree_1(std::move(pm_ptr_1));
 	btree<Person> tree_2(std::move(pm_ptr_2));
 
-	std::ifstream stream_1(dataset1);
+	std::ifstream stream_1(dataset1, std::ifstream::in);
 	
 	Person tmp;
 	while (not stream_1.eof()){
 		stream_1 >> tmp;
-		tree_1.insert(tmp);
 	}
 		
 	//TODO LOAD FILE WITH DATA	
 	//TODO INSERT IN TREE	
 }
-void insert_dyn_hash() {
+void insert_dyn_hash() {}
 
-}
 void insert_random_file() {}
 
 int main() {
-	const std::string data_1 = "../generator/register-dataset.txt";
-	const std::string data_2 = "../generator/register-dataset.txt";
+	const std::string data_1 = "generator/register-dataset.txt";
+	const std::string data_2 = "generator/register-dataset.txt";
 
 
 	// Time for B+
