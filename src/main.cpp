@@ -16,6 +16,8 @@ void safeStrCopy(char *to, std::string from, size_t size) {
 }
 
 struct Person {
+	using IndexType = int;
+
 	int dni;
 	char name[20];
 	char lastname[20];
@@ -86,7 +88,16 @@ void insert_random_file_test(std::vector<Person> vec) {
 	RandomFile<Person> rf("data_rf.bin", "index_rf.bin");
 
 	for (Person &p : vec) {
-		rf.add(p);
+		rf.insert(p);
+	}
+}
+
+void search_random_file_test(std::vector<Person> vec) {
+	RandomFile<Person> rf("data_rf.bin", "index_rf.bin");
+
+	int i = 0;
+	for (Person &p : vec) {
+		Person p2 = *rf.search(p.dni).record;
 	}
 }
 
@@ -109,12 +120,14 @@ int main() {
 	std::vector<Person> test_registers;
 	load_registers(test_registers, data_1);
 
+	/*
 	// Time for B+
 	auto start = std::chrono::steady_clock::now();
 	btree_test(test_registers);
 	auto end = std::chrono::steady_clock::now();
 	auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
 	std::cout << "B+ Tree took "	<< duration << "ms" << std::endl;
+	*/
 
 	//Time for RandomFile
 	auto start_2 = std::chrono::steady_clock::now();
@@ -123,11 +136,21 @@ int main() {
 	auto duration_2 = std::chrono::duration_cast<std::chrono::milliseconds>(end_2 - start_2).count();
 	std::cout << "Random File took "	<< duration_2 << "ms" << std::endl;
 
+	//Time for RandomFile
+	start_2 = std::chrono::steady_clock::now();
+	search_random_file_test(test_registers);
+	end_2 = std::chrono::steady_clock::now();
+	duration_2 = std::chrono::duration_cast<std::chrono::milliseconds>(end_2 - start_2).count();
+	std::cout << "Random File took "	<< duration_2 << "ms" << std::endl;
+
+	/*
 	//Time for DynamicHash
 	auto start_3 = std::chrono::steady_clock::now();
 	insert_dyn_hash_test(test_registers);
 	auto end_3 = std::chrono::steady_clock::now();
 	auto duration_3 = std::chrono::duration_cast<std::chrono::milliseconds>(end_3 - start_3).count();
 	std::cout << "Dynamic hash took "  << duration_3 << "ms" << std::endl;
+	*/
+
 	return 0; 
 }

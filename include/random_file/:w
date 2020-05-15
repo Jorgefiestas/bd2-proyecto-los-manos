@@ -16,8 +16,6 @@ template <class T>
 class RandomFile: public IndexingStructure<T> {
 	private:
 		using IndexType = typename IndexingStructure<T>::IndexType;
-		using ResponseCode = typename IndexingStructure<T>::ResponseCode;
-		using FileResponse = typename IndexingStructure<T>::FileResponse;
 
 		struct RandomIndex {
 			struct IndexRecord {IndexType key; int pos;};
@@ -33,16 +31,11 @@ class RandomFile: public IndexingStructure<T> {
 		std::string index_name;
 		std::unique_ptr<RandomIndex> index;
 
-
 		void save_index();
 		void load_index();
 
 	public:
-		RandomFile(std::string main_name, std::string index_name): 
-			main_name(main_name), index_name(index_name){
-				load_index();
-			}
-
+		RandomFile(std::string main_name, std::string index_name) : main_name(main_name), index_name(index_name){load_index();}
 		FileResponse insert(T record);
 		FileResponse search(IndexType key);
 		~RandomFile();
@@ -61,6 +54,7 @@ RandomFile<T>::RandomIndex::RandomIndex(const std::string& index_file){
 			int key, pos;	
 			idx_stream.read((char*)&key, sizeof(int));
 			idx_stream.read((char*)&pos, sizeof(int));
+			idx_stream.get();
 			IndexRecord r {.key = key, .pos = pos};
 			index_list.push_back(r);
 		}
@@ -68,18 +62,28 @@ RandomFile<T>::RandomIndex::RandomIndex(const std::string& index_file){
 }
 
 template <class T>
-typename RandomFile<T>::FileResponse RandomFile<T>::insert(T record){
+typename RandomFile<T>::FileResponse RandomFile<T>::add(T record){
 	typename RandomFile::RandomIndex::IndexRecord idx_rec{};
-	
-	std::fstream main_stream(main_name, std::ios_base::app | std::ios::binary);
-	std::size_t main_size = main_stream.tellp();	
+	if (file_exists(main_name)){
+		std::ofstream main_stream(main_name, std::ios_base::app | std::ios::binary);
+		std::size_t main_size = main_stream.tellp();	
 
-	idx_rec.key = record.dni;
-	idx_rec.pos = main_size / sizeof(T);
+		idx_rec.key = record.dni;
+		idx_rec.pos = main_size / sizeof(T);
 
-	main_stream.write((char*)&record, sizeof(T));
-	index->index_list.push_back(idx_rec);							
-	main_stream.close();
+		main_stream.write((char*)&record, sizeof(T));
+		index->index_list.push_back(idx_rec);							
+		main_stream.close();
+	} else {
+		std::ofstream main_stream(main_name, std::ios::out | std::ios::binary | std::ios::trunc);
+
+		idx_rec.key = record.dni;
+		idx_rec.pos = 0;
+
+		main_stream.write((char*)&record, sizeof(T));
+		index->index_list.push_back(idx_rec);
+		main_stream.close();
+	}
 
 	FileResponse res {.code = ResponseCode::SUCCESS, .pos = idx_rec.pos};
 	return res;
@@ -87,15 +91,10 @@ typename RandomFile<T>::FileResponse RandomFile<T>::insert(T record){
 
 template <class T>
 typename RandomFile<T>::FileResponse RandomFile<T>::search(IndexType key) {
-	auto it = index->index_list.begin();
-
-	while (it != index->index_list.end()) {
-		if (it->key == key) break;
-		it++;
-	}
+	auto it = std::find_if(index->index_list.begin(), index->index_list.end(), [&](const auto& rec){key == rec.key;});		
 
 	if (it == index->index_list.end()){
-		FileResponse res {.code = ResponseCode::NOT_FOUND};
+		FileResponse res {.code = ResponseCode::not_found};
 		return res;
 	}
 	
@@ -111,20 +110,13 @@ template <class T>
 void RandomFile<T>::load_index(){
 	index = std::make_unique<RandomFile::RandomIndex>(index_name);		
 }
-
 template <class T>
-void RandomFile<T>::save_index() {
+void RandomFile<T>::save_index(){
 	std::ofstream index_stream(index_name, std::ios::out | std::ios::binary);
-
-	std::for_each(index->index_list.begin(), 
-			index->index_list.end(), 
-			[&index_stream](const auto& rec){
-				index_stream.write((char*)&rec, sizeof(decltype(rec)));
-			});
-
+	std::for_each(index->index_list.begin(), index->index_list.end(), [&index_stream](const auto& rec){ 
+			index_stream.write((char*)&rec, sizeof(decltype(rec)));});
 	index_stream.close();
 }
-
 template <class T> RandomFile<T>::~RandomFile(){
 	save_index();
 }

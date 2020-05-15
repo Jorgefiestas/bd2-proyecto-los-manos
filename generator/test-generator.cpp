@@ -65,6 +65,7 @@ class RegisterGenerator {
 				do {
 					id = randomId();
 				} while(seenIds.count(id));
+				seenIds.insert(id);
 
 				outfile << id << ' ';
 				outfile << randomName() << ' ';
