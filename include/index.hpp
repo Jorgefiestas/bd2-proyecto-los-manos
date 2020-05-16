@@ -1,5 +1,6 @@
 #ifndef INDEX_HPP
 #define INDEX_HPP
+#include <optional>
 
 template <class T>
 class IndexingStructure {

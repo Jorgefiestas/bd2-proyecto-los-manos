@@ -6,7 +6,13 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_BUILD_TYPE Debug)
 include_directories(include)
 set(SOURCES src/main.cpp)
+set(INSERT_SOURCES webscripts/insert.cpp)
+set(SEARCH_SOURCES webscripts/search.cpp)
+set(RSEARCH_SOURCES webscripts/search-range.cpp)
 
 add_executable(${PROJECT_NAME} ${SOURCES})
+add_executable(insert ${INSERT_SOURCES})
+add_executable(search ${SEARCH_SOURCES})
+add_executable(range_search ${RSEARCH_SOURCES})
 
 
