@@ -85,7 +85,7 @@ typename RandomFile<T>::FileResponse RandomFile<T>::insert(T record){
 	main_stream.write((char*)&record, sizeof(T));
 	index->index_list.push_back(idx_rec);							
 	main_stream.close();
-	disk_acceses;
+	disk_acceses++;
 
 	FileResponse res {.code = ResponseCode::SUCCESS, .pos = idx_rec.pos};
 	return res;

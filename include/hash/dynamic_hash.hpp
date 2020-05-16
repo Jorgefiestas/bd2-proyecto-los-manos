@@ -161,12 +161,11 @@ std::optional<T> DinHash<T, fd>::search(int key) {
 template <class T, int fd> 
 std::vector<T> DinHash<T, fd>::range_search(int key_start, int key_end) {
 	std::vector<T> vec;
-	int hash_start = key_start & make_mask(max_depth);
-	int hash_end = key_end& make_mask(max_depth);
-	for(int x = hash_start;x <= hash_end;x++){
+	for(int x = key_start; x <= key_end; x++){
 		auto val = search(x);
-		if(val)
+		if(val) {
 			vec.push_back(val.value());
+		}
 	}
 	return vec;
 }	

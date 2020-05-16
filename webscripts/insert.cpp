@@ -7,7 +7,7 @@
 #include <random_file/random_file.hpp>
 #include <register/register.hpp>
 
-int main() {
+int main(int argc, char** argv) {
   const std::string hash_file = "store/hash.bin";
   const std::string rf_data = "store/rf_data.bin";
   const std::string rf_index = "store/rf_index.bin";
@@ -16,8 +16,12 @@ int main() {
   int structure, dni, age;
   std::string name, lastname, birth_date;
 
-  std::cin >> structure;
-  std::cin >> dni >> name >> lastname >> age >> birth_date;
+  structure = atoi(argv[1]);
+  dni = atoi(argv[2]);
+  name = argv[3];
+  lastname = argv[4];
+  age = atoi(argv[5]);
+  birth_date = argv[6];
 
   Person reg(dni, name, lastname, age, birth_date);
 
