@@ -8,35 +8,32 @@ app.use(cors())
 app.use(bodyParser.json())
 
 const insertToDB = (strat, register) => {
-  console.log(Object.values(register).join(' '))
-  execSync(`../webscripts/insert ${strat} ${Object.values(register).join(' ')}`)
+  execSync(`cd ../build; ./insert ${strat} ${Object.values(register).join(' ')}`)
   return true
 }
 
-const readFromDB = () => {
-  return [
-    [73982623, 'Arturo', 'Cuya', 20, '22/10/99'],
-    [9283948, 'Mario', 'Pierini', 40, '12/12/12']
-  ]
+const readFromDB = (strat) => {
+  const output = execSync(`cd ../build; ./read ${strat}`)
+  if (output.length > 0) {
+  return output.toString().split('\n').map(row => row.split(' ')) 
+  } else {
+    return []
+  }
 }
 
 const searchInDB = (index, from, to = '') => {
   if (to.length > 0) {
-    const output = execSync(`../webscripts/range_search ${index} ${from} ${to}`)
-    console.log("range search output")
-    console.log(output.toString())
+    const output = execSync(`cd ../build; ./range_search ${index} ${from} ${to}`)
+    return output.toString().split('\n').map(row => row.split(' '))
   } else {
-    console.log("search output")
-    const output = execSync(`../webscripts/search ${index} ${from}`)
-    console.log(output.toString())
+    const output = execSync(`cd ../build; ./search ${index} ${from}`)
+    return [output.toString().split(' ')]
   }
-
-  return [[73982623, 'Arturo', 'Cuya', 20, '22/10/99']]
 }
 
-app.get('/read', (req, res) => {
+app.post('/read', (req, res) => {
   console.log('GET read')
-  res.send(readFromDB())
+  res.send(readFromDB(req.body.strat))
 })
 
 app.post('/insert', (req, res)=> {

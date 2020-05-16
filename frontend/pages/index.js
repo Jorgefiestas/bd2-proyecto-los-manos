@@ -48,7 +48,8 @@ const Index = () => {
   })
 
   const read = async () => {
-    const result = await axios.get(`${url}/read`)
+    const body = { strat: state.strat }
+    const result = await axios.post(`${url}/read`, body)
 
     setState({
       ...state,
