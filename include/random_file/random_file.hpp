@@ -29,6 +29,7 @@ class RandomFile: public IndexingStructure<T> {
 
 		};
 
+		int disk_acceses = 0;
 		std::string main_name;
 		std::string index_name;
 		std::unique_ptr<RandomIndex> index;
@@ -43,6 +44,9 @@ class RandomFile: public IndexingStructure<T> {
 				load_index();
 			}
 
+		int get_disk_access(){
+			return disk_acceses;
+		}
 		FileResponse insert(T record);
 		FileResponse search(IndexType key);
 		std::vector<T> range_search(IndexType start_key, IndexType end_key);	
@@ -81,6 +85,7 @@ typename RandomFile<T>::FileResponse RandomFile<T>::insert(T record){
 	main_stream.write((char*)&record, sizeof(T));
 	index->index_list.push_back(idx_rec);							
 	main_stream.close();
+	disk_acceses;
 
 	FileResponse res {.code = ResponseCode::SUCCESS, .pos = idx_rec.pos};
 	return res;
@@ -105,6 +110,7 @@ typename RandomFile<T>::FileResponse RandomFile<T>::search(IndexType key) {
 	main_stream.seekg((*it).pos * sizeof(T), std::ios::beg);
 	main_stream.read((char*)&obj, sizeof(T));
 	FileResponse res{.code = ResponseCode::SUCCESS, .pos = (*it).pos, .record = std::make_optional(obj)}; 
+	disk_acceses++;
 	return res;
 }
 template <class T>
@@ -118,6 +124,7 @@ std::vector<T> RandomFile<T>::range_search(IndexType start_key, IndexType end_ke
 			main_stream.seekg((*it).pos * sizeof(T), std::ios::beg);
 			main_stream.read((char*)&obj, sizeof(T));
 			vec.push_back(obj);
+			disk_acceses++;
 		}
 		it++;
 	}
@@ -136,8 +143,9 @@ void RandomFile<T>::save_index() {
 
 	std::for_each(index->index_list.begin(), 
 			index->index_list.end(), 
-			[&index_stream](const auto& rec){
+			[&index_stream, this](const auto& rec){
 				index_stream.write((char*)&rec, sizeof(decltype(rec)));
+				disk_acceses++;
 			});
 
 	index_stream.close();
