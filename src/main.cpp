@@ -120,7 +120,7 @@ int search_dyn_hash_test(std::vector<Person> &vec) {
 int rsearch_dyn_hash_test(std::vector<Person> &vec) {
   DinHash<Person, 10> dhash(5, "test/data_hash" + std::to_string(t) + ".bin");
 
-  dhash.range_search(vec[0].dni, vec[vec.size()-1].dni);
+  dhash.range_search(vec[0].dni, vec[0].dni + 10000);
 	return dhash.get_disk_access();
 }
 
@@ -196,7 +196,11 @@ int main() {
     std::vector<Person> test_registers;
     load_registers(test_registers, data_1);
 
-		int disk_acc = 0;
+	if (test_registers[0].dni > test_registers[test_registers.size() - 1].dni) {
+		std::swap(test_registers[0], test_registers[test_registers.size() - 1]);
+	}
+
+	int disk_acc = 0;
     // Time for Btree
     auto start = std::chrono::steady_clock::now();
     disk_acc = insert_btree_test(test_registers);
