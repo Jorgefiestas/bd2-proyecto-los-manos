@@ -59,10 +59,11 @@ const Index = () => {
   }
 
   const search = async () => {
-    const result = await axios.post(`${url}/search`, {
+    const body = {
       ...state.search,
       strat: state.strat
-    })
+    }
+    const result = await axios.post(`${url}/search`, body)
 
     console.log(result.data)
 
