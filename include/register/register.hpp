@@ -4,9 +4,10 @@
 #include <algorithm>
 
 void safeStrCopy(char *to, std::string from, size_t size) {
-  for (size_t idx = 0; idx < std::min(size, from.length()); idx++) {
+  for (size_t idx = 0; idx < std::min(size-1, from.length()); idx++) {
     to[idx] = from[idx];
   }
+	to[std::min(size-1, from.length())] = '\0';
 }
 
 struct Person {
@@ -34,14 +35,8 @@ struct Person {
   bool operator==(const Person &other) { return dni == other.dni; }
 
   friend std::ostream &operator<<(std::ostream &stream, Person &record) {
-    stream.write((char *)&record.dni, sizeof(int));
-    stream.write((char *)&record.name, 20);
-    stream.write((char *)&record.lastname, 20);
-    stream.write((char *)&record.age, sizeof(int));
-    stream.write((char *)&record.birth_date, sizeof(int));
-
-    stream << "\n";
-    stream << std::flush;
+	stream << record.dni << ' ' << record.name << ' ' << record.lastname << ' '
+		<< record.age << ' ' << record.birth_date << std::flush;
     return stream;
   }
 
