@@ -103,7 +103,7 @@ public:
 
 template <class T, int BTREE_ORDER>
 int btree<T, BTREE_ORDER>::get_disk_access() {
-  return this->disk_access;
+  return disk_acceses;
 }
 template <class T, int BTREE_ORDER>
 btree<T, BTREE_ORDER>::node::node(long page_id) : page_id{page_id} {
