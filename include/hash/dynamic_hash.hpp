@@ -78,6 +78,16 @@ class DinHash {
 
 		}
 
+		std::vector<T> get_all(){
+			std::vector<T> vec;
+			for(int e : index){
+				auto b = read_bucket(e);
+				for (int s = 0;s < b.size;s++){
+					vec.push_back(b.values[s]);
+				}
+			}
+			return vec;
+		}
 		int get_disk_access(){
 			return disk_acceses;
 		}
@@ -187,10 +197,11 @@ std::optional<T> DinHash<T, fd>::search(int key) {
 template <class T, int fd> 
 std::vector<T> DinHash<T, fd>::range_search(int key_start, int key_end) {
 	std::vector<T> vec;
-	for(int x = key_start; x <= key_end; x++){
-		auto val = search(x);
-		if(val) {
-			vec.push_back(val.value());
+	for(int e : index){
+		auto b = read_bucket(e);
+		for (int s = 0;s < b.size;s++){
+			if (b.values[s].dni >= key_start && b.values[s].dni <= key_end)
+				vec.push_back(b.values[s]);
 		}
 	}
 	return vec;

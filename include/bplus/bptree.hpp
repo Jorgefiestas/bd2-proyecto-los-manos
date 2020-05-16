@@ -115,6 +115,7 @@ std::vector<T> btree<T, BTREE_ORDER>::get_all() {
 	auto it = iterator(this, root);
 	while(it != this->end()){
 		vec.push_back(*it);
+		it++;
 	}
 	return vec;
 }
