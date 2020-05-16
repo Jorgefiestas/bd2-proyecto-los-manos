@@ -4,9 +4,10 @@
 #include <algorithm>
 
 void safeStrCopy(char *to, std::string from, size_t size) {
-  for (size_t idx = 0; idx < std::min(size, from.length()); idx++) {
+  for (size_t idx = 0; idx < std::min(size-1, from.length()); idx++) {
     to[idx] = from[idx];
   }
+	to[std::min(size-1, from.length())] = '\0';
 }
 
 struct Person {
