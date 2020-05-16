@@ -147,14 +147,13 @@ void load_registers(std::vector<Person> &vec, const std::string &dataset_name) {
 
   int dni, age;
   std::string name, lastname, birth_date;
-  int counter = 0;
-  while (not stream_1.eof() and counter < 10) {
+  while (not stream_1.eof()) {
     stream_1 >> dni >> name >> lastname >> age >> birth_date;
     Person reg(dni, name, lastname, age, birth_date);
     vec.emplace_back(reg);
-		counter++;
   }
 }
+
 
 int main() {
   const std::string data_1 = "generator/register-dataset.txt";
@@ -171,7 +170,7 @@ int main() {
 
   for (int N = 10000; N <= 100000; N += 10000) {
     t++;
-    std::cout << N << std::endl;
+    std::cout << "\b\r" << N << std::endl;
     results << N << ',';
 
     RegisterGenerator gen(namesPath, lastnamesPath, data_1);
@@ -245,7 +244,7 @@ int main() {
     duration_3 =
         std::chrono::duration_cast<std::chrono::milliseconds>(end_3 - start_3)
             .count();
-    results << duration_3 << std::endl;
+    results << duration_3 << ',';
 
     start = std::chrono::steady_clock::now();
     rsearch_dyn_hash_test(test_registers);
@@ -253,7 +252,7 @@ int main() {
     duration =
         std::chrono::duration_cast<std::chrono::milliseconds>(end - start)
             .count();
-    results << duration << ',';
+    results << duration << std::endl;
   }
 
   results.close();
