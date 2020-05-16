@@ -38,6 +38,7 @@ class DinHash {
 		std::string filename;
 		int max_depth;
 		std::set<int> index;
+		int disk_acceses = 0;
 
 		unsigned int make_mask(int n) { return (1 << n) - 1; }
 		Bucket read_bucket(int pos);
@@ -59,6 +60,9 @@ class DinHash {
 			out_stream.close();
 		}
 
+		int get_disk_access(){
+			return disk_acceses;
+		}
 		void insert(int key, T obj);
 		std::optional<T> search(int key);
 		std::vector<T> range_search(int start_key, int end_key); 
@@ -104,6 +108,7 @@ typename DinHash<T, fd>::Bucket DinHash<T, fd>::read_bucket(int hash) {
 	Bucket b;
 	in_stream.read((char*) &b, sizeof(Bucket));
 	in_stream.close();
+	disk_acceses++;
 	return b;
 }
 
@@ -113,6 +118,7 @@ void DinHash<T, fd>::write_bucket(int hash, Bucket b) {
 	out_stream.seekp(hash * sizeof(Bucket) + sizeof(int), std::ios::beg);
 	out_stream.write((char*)&b, sizeof(Bucket));
 	out_stream.close();
+	disk_acceses++;
 }
 
 template <class T, int fd> 

@@ -64,6 +64,7 @@ public:
   };
 
 private:
+  int disk_acceses = 0;
   std::shared_ptr<pagemanager> pm;
 
 public:
@@ -73,6 +74,8 @@ public:
   iterator end();
 
   node new_node();
+
+  int get_disk_access();
 
   node read_node(long page_id);
   void write_node(long page_id, node n);
@@ -89,7 +92,7 @@ public:
   std::optional<node> find_node(const T &value);
   std::optional<node> find_node(node &ptr, const T &value);
 
-	std::vector<T> range_search(const T &begin, const T &end);
+  std::vector<T> range_search(const T &begin, const T &end);
 
   void print(std::ostream &out, std::string separator);
   void print(node &ptr, int level, std::ostream &out, std::string separator);
@@ -98,6 +101,10 @@ public:
   void print_tree(node &ptr, int level);
 };
 
+template <class T, int BTREE_ORDER>
+int btree<T, BTREE_ORDER>::get_disk_access() {
+  return this->disk_access;
+}
 template <class T, int BTREE_ORDER>
 btree<T, BTREE_ORDER>::node::node(long page_id) : page_id{page_id} {
   count = 0;
@@ -143,6 +150,7 @@ typename btree<T, BTREE_ORDER>::node btree<T, BTREE_ORDER>::new_node() {
   header.count++;
   node ret{header.count};
   pm->save(0, header);
+  this->disk_acceses++;
   return ret;
 }
 
@@ -151,12 +159,14 @@ typename btree<T, BTREE_ORDER>::node
 btree<T, BTREE_ORDER>::read_node(long page_id) {
   node n{-1};
   pm->recover(page_id, n);
+  disk_acceses++;
   return n;
 }
 
 template <class T, int BTREE_ORDER>
 void btree<T, BTREE_ORDER>::write_node(long page_id, node n) {
   pm->save(page_id, n);
+  disk_acceses++;
 }
 
 template <class T, int BTREE_ORDER>
@@ -418,8 +428,8 @@ btree<T, BTREE_ORDER>::find_node(node &ptr, const T &value) {
 }
 
 template <class T, int BTREE_ORDER>
-std::vector<T>
-btree<T, BTREE_ORDER>::range_search(const T &begin, const T &end) {
+std::vector<T> btree<T, BTREE_ORDER>::range_search(const T &begin,
+                                                   const T &end) {
   std::optional<typename btree<T, BTREE_ORDER>::node> start = find_node(begin);
   std::optional<typename btree<T, BTREE_ORDER>::node> finish = find_node(end);
   std::vector<T> vec;
@@ -431,10 +441,10 @@ btree<T, BTREE_ORDER>::range_search(const T &begin, const T &end) {
                    : iterator(this, start.value());
 
   while (it != this->end()) {
-		vec.push_back(*it);
+    vec.push_back(*it);
     it++;
   }
-	return vec;
+  return vec;
 }
 
 template <class T, int BTREE_ORDER>
