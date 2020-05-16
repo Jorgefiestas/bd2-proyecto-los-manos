@@ -1,9 +1,11 @@
-#include "../include/random_file/random_file.hpp"
-#include "../include/bplus/bptree.hpp"
-#include "../include/bplus/pagemanager.hpp"
-#include "../include/hash/dynamic_hash.hpp"
 #include <iostream>
 #include <memory>
+
+#include <register/register.hpp>
+#include <random_file/random_file.hpp>
+#include <bplus/bptree.hpp>
+#include <bplus/pagemanager.hpp>
+#include <hash/dynamic_hash.hpp>
 
 int main() {
 	const std::string hash_file = "store/hash.bin";
@@ -11,27 +13,46 @@ int main() {
 	const std::string rf_index = "store/rf_index.bin";
 	const std::string bptree_file = "store/bptree.bin";
 
-	int structure, dni;
+	int structure, dni_1, age_1, dni_2, age_2;
+  std::string name_1, name_2, lastname_1, lastname_2, birth_date_1, birth_date_2;
 
 	std::cin >> structure;
-	std::cin >> dni;
 
-	Person reg(dni, name, lastname, age, birth_date);
+  std::cin >> dni_1 >> name_1 >> lastname_1 >> age_1 >> birth_date_1;
+  std::cin >> dni_2 >> name_2 >> lastname_2 >> age_2 >> birth_date_2;
+
+	Person reg_1(dni_1, name_1, lastname_1, age_1, birth_date_1);
+	Person reg_2(dni_2, name_2, lastname_2, age_2, birth_date_2);
 
 	switch (structure) {
 		case 0:
+			{
 			DinHash<Person, 10> dh(5, hash_file);
-			std::cout << dh.rsearch(dni) << std::endl;
+			auto vec = dh.range_search(dni_1, dni_2);
+			for (auto& e : vec){
+				std::cout << e << std::endl;
+			}
 			break;
+			}
 		case 1:
+			{
 			RandomFile<Person> rf(rf_data, rf_index);
-			std::cout << rf.rsearch(dni) << std::endl;
+			auto vec =  rf.range_search(dni_1, dni_2);
+			for (auto& e : vec){
+				std::cout << e << std::endl;
+			}
 			break;
+			}
 		case 2:
+			{
 		  auto pm_ptr_1 = std::make_shared<pagemanager>(bptree_file);
 			btree<Person> bt(std::move(pm_ptr_1));
-			std::cout << dh.rsearch(dni) << std::endl;
+			auto vec = bt.range_search(reg_1, reg_2);
+			for (auto& e : vec){
+				std::cout << e << std::endl;
+			}
 			break;
+			}
 	}
 
 	return 0;

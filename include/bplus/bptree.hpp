@@ -3,6 +3,7 @@
 
 #include <bplus/pagemanager.hpp>
 #include <iterator>
+#include <vector>
 #include <memory>
 #include <optional>
 #include <string>
