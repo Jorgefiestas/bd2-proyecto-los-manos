@@ -7,7 +7,9 @@ var app = express()
 app.use(cors())
 app.use(bodyParser.json())
 
-const insertToDB = (register) => {
+const insertToDB = (strat, register) => {
+  console.log(Object.values(register).join(' '))
+  execSync(`../webscripts/insert ${strat} ${Object.values(register).join(' ')}`)
   return true
 }
 
@@ -21,8 +23,10 @@ const readFromDB = () => {
 const searchInDB = (index, from, to = '') => {
   if (to.length > 0) {
     const output = execSync(`../webscripts/range_search ${index} ${from} ${to}`)
+    console.log("range search output")
     console.log(output.toString())
   } else {
+    console.log("search output")
     const output = execSync(`../webscripts/search ${index} ${from}`)
     console.log(output.toString())
   }
@@ -36,7 +40,12 @@ app.get('/read', (req, res) => {
 })
 
 app.post('/insert', (req, res)=> {
-  console.log('POST insert')
+  const {strat, dni, nombres, apellidos, edad, fecha} = req.body
+  const register = {dni,nombres,apellidos,edad,fecha}
+  console.log('register')
+  console.log(register)
+  insertToDB(strat,register)
+
   res.send('Ok')
 })
 

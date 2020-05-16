@@ -79,7 +79,11 @@ const Index = () => {
   }
 
   const insert = async () => {
-    const result = await axios.post(`${url}/search`, state.search)
+    const body = {
+      ...state.insert,
+      strat: state.strat
+    }
+    const result = await axios.post(`${url}/insert`, body)
     setState({
       ...state,
       operation: 'Inserción de nuevo registro'
@@ -115,7 +119,6 @@ const Index = () => {
           <TextField
             select
             label="Estrategia de indexación"
-            helperText="Solo B+ Tree permite búsqueda por rango"
             variant="outlined"
             value={state.strat}
             onChange={e =>
@@ -124,7 +127,7 @@ const Index = () => {
             style={{ width: 300, marginTop: 20 }}
           >
             <MenuItem value={0}>Dynamic Hash</MenuItem>
-            <MenuItem value={1}>Random Page</MenuItem>
+            <MenuItem value={1}>Random File</MenuItem>
             <MenuItem value={2}>B+ Tree</MenuItem>
           </TextField>
           <Tabs
@@ -171,56 +174,54 @@ const Index = () => {
                     Buscar
                   </Button>
                 </Grid>
-                {state.strat === 2 && (
-                  <Grid
-                    container
-                    direction="column"
-                    style={{ width: 400 }}
+                <Grid
+                  container
+                  direction="column"
+                  style={{ width: 400 }}
+                >
+                  <Text>Búsqueda por rango</Text>
+                  <TextField
+                    variant="outlined"
+                    label="DNI desde"
+                    style={{ marginBottom: 20 }}
+                    value={state.search.from}
+                    onChange={e =>
+                      setState({
+                        ...state,
+                        search: {
+                          ...state.search,
+                          from: e.target.value
+                        }
+                      })
+                    }
+                  />
+                  <TextField
+                    variant="outlined"
+                    label="DNI hasta"
+                    style={{ marginBottom: 20 }}
+                    value={state.search.to}
+                    onChange={e =>
+                      setState({
+                        ...state,
+                        search: {
+                          ...state.search,
+                          to: e.target.value
+                        }
+                      })
+                    }
+                  />
+                  <Button
+                    variant="contained"
+                    style={{
+                      backgroundColor: 'royalblue',
+                      color: '#fff',
+                      width: 200
+                    }}
+                    onClick={search}
                   >
-                    <Text>Búsqueda por rango</Text>
-                    <TextField
-                      variant="outlined"
-                      label="DNI desde"
-                      style={{ marginBottom: 20 }}
-                      value={state.search.from}
-                      onChange={e =>
-                        setState({
-                          ...state,
-                          search: {
-                            ...state.search,
-                            from: e.target.value
-                          }
-                        })
-                      }
-                    />
-                    <TextField
-                      variant="outlined"
-                      label="DNI hasta"
-                      style={{ marginBottom: 20 }}
-                      value={state.search.to}
-                      onChange={e =>
-                        setState({
-                          ...state,
-                          search: {
-                            ...state.search,
-                            to: e.target.value
-                          }
-                        })
-                      }
-                    />
-                    <Button
-                      variant="contained"
-                      style={{
-                        backgroundColor: 'royalblue',
-                        color: '#fff',
-                        width: 200
-                      }}
-                      onClick={search}
-                    >
-                      Buscar por rango
-                    </Button>
-                  </Grid>
-                )}
+                    Buscar por rango
+                  </Button>
+                </Grid>
               </>
             ) : (
               <Grid
@@ -229,7 +230,6 @@ const Index = () => {
                 style={{ width: 400 }}
               >
                 <TextField
-                  className="field"
                   label="DNI"
                   variant="outlined"
                   style={{ marginBottom: 20 }}
@@ -243,7 +243,6 @@ const Index = () => {
                 />
                 <TextField
                   variant="outlined"
-                  className="field"
                   label="Nombres"
                   style={{ marginBottom: 20 }}
                   value={state.insert.nombres}
@@ -259,7 +258,6 @@ const Index = () => {
                 />
                 <TextField
                   variant="outlined"
-                  className="field"
                   label="Apellidos"
                   style={{ marginBottom: 20 }}
                   value={state.insert.apellidos}
@@ -275,7 +273,6 @@ const Index = () => {
                 />
                 <TextField
                   variant="outlined"
-                  className="field"
                   label="Edad"
                   style={{ marginBottom: 20 }}
                   value={state.insert.edad}
@@ -291,7 +288,6 @@ const Index = () => {
                 />
                 <TextField
                   variant="outlined"
-                  className="field"
                   label="Fecha de nacimiento"
                   helperText="Formato: dd/mm/aaaa"
                   style={{ marginBottom: 20 }}
