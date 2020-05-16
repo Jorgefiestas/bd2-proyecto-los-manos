@@ -62,10 +62,15 @@ template <class T>
 RandomFile<T>::RandomIndex::RandomIndex(const std::string& index_file){
 	if (file_exists(index_file)) {
 		std::ifstream idx_stream(index_file, std::ios::binary);
-		while(not idx_stream.eof()){
+		while(true){
 			int key, pos;	
 			idx_stream.read((char*)&key, sizeof(int));
 			idx_stream.read((char*)&pos, sizeof(int));
+
+			if (idx_stream.eof()) {
+				break;
+			}
+
 			IndexRecord r {.key = key, .pos = pos};
 			index_list.push_back(r);
 		}
@@ -117,6 +122,7 @@ template <class T>
 std::vector<T> RandomFile<T>::range_search(IndexType start_key, IndexType end_key) {
 	std::vector<T> vec;
 	std::ifstream main_stream(main_name, std::ios::in | std::ios::binary);
+
 	auto it = index->index_list.begin();
 	T obj;
 	while (it != index->index_list.end()) {
@@ -144,7 +150,7 @@ void RandomFile<T>::save_index() {
 	std::for_each(index->index_list.begin(), 
 			index->index_list.end(), 
 			[&index_stream, this](const auto& rec){
-				index_stream.write((char*)&rec, sizeof(decltype(rec)));
+				index_stream.write((char*) &rec, sizeof rec);
 				disk_acceses++;
 			});
 

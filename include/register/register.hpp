@@ -34,14 +34,8 @@ struct Person {
   bool operator==(const Person &other) { return dni == other.dni; }
 
   friend std::ostream &operator<<(std::ostream &stream, Person &record) {
-    stream.write((char *)&record.dni, sizeof(int));
-    stream.write((char *)&record.name, 20);
-    stream.write((char *)&record.lastname, 20);
-    stream.write((char *)&record.age, sizeof(int));
-    stream.write((char *)&record.birth_date, sizeof(int));
-
-    stream << "\n";
-    stream << std::flush;
+	stream << record.dni << ' ' << record.name << ' ' << record.lastname << ' '
+		<< record.age << ' ' << record.birth_date << std::flush;
     return stream;
   }
 
