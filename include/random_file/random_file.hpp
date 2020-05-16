@@ -50,12 +50,31 @@ class RandomFile: public IndexingStructure<T> {
 		FileResponse insert(T record);
 		FileResponse search(IndexType key);
 		std::vector<T> range_search(IndexType start_key, IndexType end_key);	
+		std::vector<T> get_all();
 		~RandomFile();
 };
 
 bool file_exists(const std::string& filename) {
 	struct stat buffer;
 	return (stat (filename.c_str(), &buffer) == 0);
+}
+
+
+template <class T>
+std::vector<T> RandomFile<T>::get_all() {
+	std::vector<T> vec;
+	auto it = index->index_list.begin();
+	std::ifstream main_stream(main_name, std::ios::in | std::ios::binary);
+	T obj;
+
+	while (it != index->index_list.end()) {
+		main_stream.seekg((*it).pos * sizeof(T), std::ios::beg);
+		main_stream.read((char*)&obj, sizeof(T));
+		vec.push_back(obj);
+		it++;
+		disk_acceses++;
+	}
+	return vec;
 }
 
 template <class T>

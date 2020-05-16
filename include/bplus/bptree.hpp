@@ -71,6 +71,7 @@ private:
 public:
   btree(std::shared_ptr<pagemanager> pm);
 
+	std::vector<T> get_all();
   iterator begin();
   iterator end();
 
@@ -105,6 +106,17 @@ public:
 template <class T, int BTREE_ORDER>
 int btree<T, BTREE_ORDER>::get_disk_access() {
   return disk_acceses;
+}
+
+template <class T, int BTREE_ORDER>
+std::vector<T> btree<T, BTREE_ORDER>::get_all() {
+	std::vector<T> vec;
+  node root = read_node(header.root_id);
+	auto it = iterator(this, root);
+	while(it != this->end()){
+		vec.push_back(*it);
+	}
+	return vec;
 }
 template <class T, int BTREE_ORDER>
 btree<T, BTREE_ORDER>::node::node(long page_id) : page_id{page_id} {
