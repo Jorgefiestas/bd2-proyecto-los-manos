@@ -7,24 +7,19 @@
 #include <bplus/pagemanager.hpp>
 #include <hash/dynamic_hash.hpp>
 
-int main() {
-	const std::string hash_file = "store/hash.bin";
-	const std::string rf_data = "store/rf_data.bin";
-	const std::string rf_index = "store/rf_index.bin";
-	const std::string bptree_file = "store/bptree.bin";
+int main(int argc, char** argv) {
+  const std::string hash_file = "store/hash.bin";
+  const std::string rf_data = "store/rf_data.bin";
+  const std::string rf_index = "store/rf_index.bin";
+  const std::string bptree_file = "store/bptree.bin";
 
-	int structure, dni_1, age_1, dni_2, age_2;
-  std::string name_1, name_2, lastname_1, lastname_2, birth_date_1, birth_date_2;
+  int structure, dni_1, dni_2;
 
-	std::cin >> structure;
+  structure = atoi(argv[1]);
+  dni_1 = atoi(argv[2]);
+  dni_2 = atoi(argv[3]);
 
-  std::cin >> dni_1 >> name_1 >> lastname_1 >> age_1 >> birth_date_1;
-  std::cin >> dni_2 >> name_2 >> lastname_2 >> age_2 >> birth_date_2;
-
-	Person reg_1(dni_1, name_1, lastname_1, age_1, birth_date_1);
-	Person reg_2(dni_2, name_2, lastname_2, age_2, birth_date_2);
-
-	switch (structure) {
+  switch (structure) {
 		case 0:
 			{
 			DinHash<Person, 10> dh(5, hash_file);
@@ -47,6 +42,9 @@ int main() {
 			{
 		  auto pm_ptr_1 = std::make_shared<pagemanager>(bptree_file);
 			btree<Person> bt(std::move(pm_ptr_1));
+			Person reg_1, reg_2;
+			reg_1.dni = dni_1;
+			reg_2.dni = dni_2;
 			auto vec = bt.range_search(reg_1, reg_2);
 			for (auto& e : vec){
 				std::cout << e << std::endl;

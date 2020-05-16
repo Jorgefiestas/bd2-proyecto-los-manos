@@ -7,21 +7,18 @@
 #include <bplus/pagemanager.hpp>
 #include <hash/dynamic_hash.hpp>
 
-int main() {
-	const std::string hash_file = "store/hash.bin";
-	const std::string rf_data = "store/rf_data.bin";
-	const std::string rf_index = "store/rf_index.bin";
-	const std::string bptree_file = "store/bptree.bin";
+int main(int argc, char** argv) {
+  const std::string hash_file = "store/hash.bin";
+  const std::string rf_data = "store/rf_data.bin";
+  const std::string rf_index = "store/rf_index.bin";
+  const std::string bptree_file = "store/bptree.bin";
 
-	int structure, dni, age;
-  std::string name, lastname, birth_date;
+  int structure, dni;
 
-	std::cin >> structure;
-  std::cin >> dni >> name >> lastname >> age >> birth_date;
+  structure = atoi(argv[1]);
+  dni = atoi(argv[2]);
 
-	Person reg(dni, name, lastname, age, birth_date);
-
-	switch (structure) {
+  switch (structure) {
 		case 0:
 			{
 			DinHash<Person, 10> dh(5, hash_file);
@@ -40,6 +37,8 @@ int main() {
 			{
 		  auto pm_ptr_1 = std::make_shared<pagemanager>(bptree_file);
 			btree<Person> bt(std::move(pm_ptr_1));
+			Person reg;
+			reg.dni = dni;
 			Person t = *bt.search(reg);
 			std::cout << t << std::endl;
 			break;
