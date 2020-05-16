@@ -45,6 +45,7 @@ class RandomFile: public IndexingStructure<T> {
 
 		FileResponse insert(T record);
 		FileResponse search(IndexType key);
+		std::vector<T> range_search(IndexType start_key, IndexType end_key);	
 		~RandomFile();
 };
 
@@ -105,6 +106,23 @@ typename RandomFile<T>::FileResponse RandomFile<T>::search(IndexType key) {
 	main_stream.read((char*)&obj, sizeof(T));
 	FileResponse res{.code = ResponseCode::SUCCESS, .pos = (*it).pos, .record = std::make_optional(obj)}; 
 	return res;
+}
+template <class T>
+std::vector<T> RandomFile<T>::range_search(IndexType start_key, IndexType end_key) {
+	std::vector<T> vec;
+	std::ifstream main_stream(main_name, std::ios::in | std::ios::binary);
+	auto it = index->index_list.begin();
+	T obj;
+	while (it != index->index_list.end()) {
+		if(it->key >= start_key && it->key <= end_key){
+			main_stream.seekg((*it).pos * sizeof(T), std::ios::beg);
+			main_stream.read((char*)&obj, sizeof(T));
+			vec.push_back(obj);
+		}
+		it++;
+	}
+
+	return vec;
 }
 
 template <class T>

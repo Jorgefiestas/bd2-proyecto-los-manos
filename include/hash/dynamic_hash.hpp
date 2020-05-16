@@ -61,6 +61,7 @@ class DinHash {
 
 		void insert(int key, T obj);
 		std::optional<T> search(int key);
+		std::vector<T> range_search(int start_key, int end_key); 
 		bool split_bucket(int hash);
 };
 
@@ -148,7 +149,21 @@ std::optional<T> DinHash<T, fd>::search(int key) {
 		Bucket b = read_bucket(hash);
 		return b.search(key);
 	}
-}
+	return std::nullopt;
+}	
+
+template <class T, int fd> 
+std::vector<T> DinHash<T, fd>::range_search(int key_start, int key_end) {
+	std::vector<T> vec;
+	int hash_start = key_start & make_mask(max_depth);
+	int hash_end = key_end& make_mask(max_depth);
+	for(int x = hash_start;x <= hash_end;x++){
+		auto val = search(x);
+		if(val)
+			vec.push_back(val.value());
+	}
+	return vec;
+}	
 
 template <class T, int fd>
 bool DinHash<T, fd>::split_bucket(int hash) {

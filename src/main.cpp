@@ -1,204 +1,262 @@
-#include <bplus/pagemanager.hpp>
-#include <hash/dynamic_hash.hpp>
-#include <bplus/bptree.hpp>
-#include <random_file/random_file.hpp>
-#include <generator.hpp>
-#include <iostream>
-#include <chrono>
-#include <memory>
-#include <fstream>
-#include <string>
 #include <algorithm>
+#include <bplus/bptree.hpp>
+#include <bplus/pagemanager.hpp>
+#include <chrono>
+#include <fstream>
+#include <generator.hpp>
+#include <hash/dynamic_hash.hpp>
+#include <iostream>
+#include <memory>
+#include <random_file/random_file.hpp>
+#include <string>
+#include <cassert>
 
 void safeStrCopy(char *to, std::string from, size_t size) {
-	for (size_t idx = 0; idx < std::min(size, from.length()); idx++) {
-		to[idx] = from[idx];
-	}
+  for (size_t idx = 0; idx < std::min(size, from.length()); idx++) {
+    to[idx] = from[idx];
+  }
 }
 
 struct Person {
-	using IndexType = int;
+  using IndexType = int;
 
-	int dni;
-	char name[20];
-	char lastname[20];
-	int age;
-	char birth_date[10];
+  int dni;
+  char name[20];
+  char lastname[20];
+  int age;
+  char birth_date[10];
 
-	bool operator <(const Person& p){
-		return dni < p.dni;
-	}
+  bool operator<(const Person &p) { return dni < p.dni; }
 
-	Person() = default;
+  Person() = default;
 
-	Person(int dni, std::string name, std::string lastname, int age, std::string birth_date) {
-		this->dni = dni;
-		this->age = age;
-		::safeStrCopy(this->name, name, 20);
-		::safeStrCopy(this->lastname, lastname, 20);
-		::safeStrCopy(this->birth_date, birth_date, 10);
-	}
+  Person(int dni, std::string name, std::string lastname, int age,
+         std::string birth_date) {
+    this->dni = dni;
+    this->age = age;
+    ::safeStrCopy(this->name, name, 20);
+    ::safeStrCopy(this->lastname, lastname, 20);
+    ::safeStrCopy(this->birth_date, birth_date, 10);
+  }
 
-	bool operator ==(const Person &other) {
-		return dni == other.dni;
-	}
+  bool operator==(const Person &other) { return dni == other.dni; }
 
-	friend std::ostream &operator<<(std::ostream& stream, Person& record) {
-		stream.write((char *)&record.dni, sizeof(int));
-		stream.write((char *)&record.name, 20);
-		stream.write((char *)&record.lastname, 20);
-		stream.write((char *)&record.age, sizeof(int));
-		stream.write((char*)&record.birth_date, sizeof(int));
+  friend std::ostream &operator<<(std::ostream &stream, Person &record) {
+    stream.write((char *)&record.dni, sizeof(int));
+    stream.write((char *)&record.name, 20);
+    stream.write((char *)&record.lastname, 20);
+    stream.write((char *)&record.age, sizeof(int));
+    stream.write((char *)&record.birth_date, sizeof(int));
 
-		stream << "\n";
-		stream << std::flush;
-		return stream;
-	}
+    stream << "\n";
+    stream << std::flush;
+    return stream;
+  }
 
-	friend std::istream &operator>>(std::istream &stream, Person& record) {
-		stream.read((char*)&record.dni, sizeof(int));
-		stream.read((char*)&record.name, 20);
-		stream.read((char*)&record.lastname, 20);
-		stream.read((char*)&record.age, sizeof(int));
-		stream.read((char*)&record.birth_date, sizeof(int));
-		stream.get();
-		return stream;
-	}
+  friend std::istream &operator>>(std::istream &stream, Person &record) {
+    stream.read((char *)&record.dni, sizeof(int));
+    stream.read((char *)&record.name, 20);
+    stream.read((char *)&record.lastname, 20);
+    stream.read((char *)&record.age, sizeof(int));
+    stream.read((char *)&record.birth_date, sizeof(int));
+    stream.get();
+    return stream;
+  }
 };
 
-
-int t = 0; // Carries a counter according to size so files of different testcases dont overlap
+int t = 0; // Carries a counter according to size so files of different
+           // testcases dont overlap
 
 void insert_btree_test(std::vector<Person> &vec) {
-	auto pm_ptr_1 = std::make_shared<pagemanager>("test/btree_data_1" + std::to_string(t) + ".bin");
-	btree<Person> tree_1(std::move(pm_ptr_1));
+  auto pm_ptr_1 = std::make_shared<pagemanager>("test/btree_data_1" +
+                                                std::to_string(t) + ".bin");
+  btree<Person> tree_1(std::move(pm_ptr_1));
 
-	
-	Person tmp;
-	for (Person &p : vec) {
-		tree_1.insert(p);
-	}
+  Person tmp;
+  for (Person &p : vec) {
+    tree_1.insert(p);
+  }
 }
 
 void search_btree_test(std::vector<Person> &vec) {
-	auto pm_ptr_1 = std::make_shared<pagemanager>("test/btree_data_1" + std::to_string(t) + ".bin");
-	btree<Person> tree_1(std::move(pm_ptr_1));
+  auto pm_ptr_1 = std::make_shared<pagemanager>("test/btree_data_1" +
+                                                std::to_string(t) + ".bin");
+  btree<Person> tree_1(std::move(pm_ptr_1));
 
-	
-	Person tmp;
-	for (Person &p : vec) {
-		tree_1.search(p);
-	}
+  Person tmp;
+  for (Person &p : vec) {
+    tree_1.search(p);
+  }
+}
+
+void rsearch_btree_test(std::vector<Person> &vec) {
+  auto pm_ptr_1 = std::make_shared<pagemanager>("test/btree_data_1" +
+                                                std::to_string(t) + ".bin");
+  btree<Person> tree_1(std::move(pm_ptr_1));
+  tree_1.range_search(vec[0], vec[vec.size() - 1]);
 }
 
 void insert_dyn_hash_test(std::vector<Person> &vec) {
-	DinHash<Person, 10> dhash(5, "test/data_hash" + std::to_string(t) + ".bin");
+  DinHash<Person, 10> dhash(5, "test/data_hash" + std::to_string(t) + ".bin");
 
-	for(Person &p : vec) {
-		dhash.insert(p.dni, p);
-	}
+  for (Person &p : vec) {
+    dhash.insert(p.dni, p);
+  }
 }
 
 void search_dyn_hash_test(std::vector<Person> &vec) {
-	DinHash<Person, 10> dhash(5, "test/data_hash" + std::to_string(t) + ".bin");
+  DinHash<Person, 10> dhash(5, "test/data_hash" + std::to_string(t) + ".bin");
 
-	for(Person &p : vec) {
-		dhash.search(p.dni);
-	}
+  for (Person &p : vec) {
+    dhash.search(p.dni);
+  }
+}
+void rsearch_dyn_hash_test(std::vector<Person> &vec) {
+  DinHash<Person, 10> dhash(5, "test/data_hash" + std::to_string(t) + ".bin");
+
+  dhash.range_search(vec[0].dni, vec[vec.size()-1].dni);
 }
 
 void insert_random_file_test(std::vector<Person> vec) {
-	RandomFile<Person> rf("test/data_rf" + std::to_string(t) + ".bin", "test/index_rf" + std::to_string(t) + ".bin");
+  RandomFile<Person> rf("test/data_rf" + std::to_string(t) + ".bin",
+                        "test/index_rf" + std::to_string(t) + ".bin");
 
-	for (Person &p : vec) {
-		rf.insert(p);
-	}
+  for (Person &p : vec) {
+    rf.insert(p);
+  }
 }
 
 void search_random_file_test(std::vector<Person> vec) {
-	RandomFile<Person> rf("test/data_rf" + std::to_string(t) + ".bin", "test/index_rf" + std::to_string(t) + ".bin");
+  RandomFile<Person> rf("test/data_rf" + std::to_string(t) + ".bin",
+                        "test/index_rf" + std::to_string(t) + ".bin");
 
-	int i = 0;
-	for (Person &p : vec) {
-		Person p2 = *rf.search(p.dni).record;
-		assert(p2.age == p.age);
-	}
+  for (Person &p : vec) {
+    Person p2 = *rf.search(p.dni).record;
+    assert(p2.age == p.age);
+  }
+}
+void rsearch_random_file_test(std::vector<Person> vec) {
+  RandomFile<Person> rf("test/data_rf" + std::to_string(t) + ".bin",
+                        "test/index_rf" + std::to_string(t) + ".bin");
+
+	rf.range_search(vec[0].dni, vec[vec.size() - 1].dni);
 }
 
 void load_registers(std::vector<Person> &vec, const std::string &dataset_name) {
-	std::ifstream stream_1(dataset_name, std::ifstream::in);
+  std::ifstream stream_1(dataset_name, std::ifstream::in);
 
-	int dni, age;
-	std::string name, lastname, birth_date;
-	while (not stream_1.eof()) {
-		stream_1 >> dni >> name >> lastname >> age >> birth_date;
-		Person reg(dni, name, lastname, age, birth_date);
-		vec.emplace_back(reg);
-	}
+  int dni, age;
+  std::string name, lastname, birth_date;
+  int counter = 0;
+  while (not stream_1.eof() and counter < 10) {
+    stream_1 >> dni >> name >> lastname >> age >> birth_date;
+    Person reg(dni, name, lastname, age, birth_date);
+    vec.emplace_back(reg);
+		counter++;
+  }
 }
 
 int main() {
-	const std::string data_1 = "generator/register-dataset.txt";
-	std::string namesPath = "generator/datasets/firstnames.txt";
-	std::string lastnamesPath = "generator/datasets/lastnames.txt";
+  const std::string data_1 = "generator/register-dataset.txt";
+  std::string namesPath = "generator/datasets/firstnames.txt";
+  std::string lastnamesPath = "generator/datasets/lastnames.txt";
 
+  std::ofstream results("results.csv");
 
-	std::ofstream results("results.csv");
+  results << "N" << ',' << "BTree Ins" << ',' << "BTree Sear" << ','
+          << "BTree RSear" << ',' << "Random File Ins" << ','
+          << "Random File Sear" << ',' << "Random File RSear" << ','
+          << "Dynamic Hash Ins" << ',' << "Dynamic Hash Sear" << ','
+          << "Dynamic Hash RSear" << std::endl;
 
-	results << "N" << ',' << "BTree Ins" << ',' << "BTree Sear" << ',' << "Random File Ins" << ',' << "Random File Sear" << ',' << "Dynamic Hash Ins" << ',' << "Dynamic Hash Ins" << std::endl;
+  for (int N = 10000; N <= 100000; N += 10000) {
+    t++;
+    std::cout << N << std::endl;
+    results << N << ',';
 
-	for (int N = 10000; N <= 100000; N += 10000) {
-		t++;
-		std::cout << N << std::endl;
-		results << N << ',';
+    RegisterGenerator gen(namesPath, lastnamesPath, data_1);
+    gen(N);
 
-		RegisterGenerator gen(namesPath, lastnamesPath, data_1);
-		gen(N);
+    std::vector<Person> test_registers;
+    load_registers(test_registers, data_1);
 
-		std::vector<Person> test_registers;
-		load_registers(test_registers, data_1);
+    // Time for Btree
+    auto start = std::chrono::steady_clock::now();
+    insert_btree_test(test_registers);
+    auto end = std::chrono::steady_clock::now();
+    auto duration =
+        std::chrono::duration_cast<std::chrono::milliseconds>(end - start)
+            .count();
+    results << duration << ',';
 
-		// Time for Btree
-		auto start = std::chrono::steady_clock::now();
-		insert_btree_test(test_registers);
-		auto end = std::chrono::steady_clock::now();
-		auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
-		results << duration << ',';
+    start = std::chrono::steady_clock::now();
+    search_btree_test(test_registers);
+    end = std::chrono::steady_clock::now();
+    duration =
+        std::chrono::duration_cast<std::chrono::milliseconds>(end - start)
+            .count();
+    results << duration << ',';
 
-		start = std::chrono::steady_clock::now();
-		search_btree_test(test_registers);
-		end = std::chrono::steady_clock::now();
-		duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
-		results << duration << ',';
+    start = std::chrono::steady_clock::now();
+    rsearch_btree_test(test_registers);
+    end = std::chrono::steady_clock::now();
+    duration =
+        std::chrono::duration_cast<std::chrono::milliseconds>(end - start)
+            .count();
+    results << duration << ',';
 
-		//Time for RandomFile
-		auto start_2 = std::chrono::steady_clock::now();
-		insert_random_file_test(test_registers);
-		auto end_2 = std::chrono::steady_clock::now();
-		auto duration_2 = std::chrono::duration_cast<std::chrono::milliseconds>(end_2 - start_2).count();
-		results << duration_2 << ',';
+    // Time for RandomFile
+    auto start_2 = std::chrono::steady_clock::now();
+    insert_random_file_test(test_registers);
+    auto end_2 = std::chrono::steady_clock::now();
+    auto duration_2 =
+        std::chrono::duration_cast<std::chrono::milliseconds>(end_2 - start_2)
+            .count();
+    results << duration_2 << ',';
 
-		start_2 = std::chrono::steady_clock::now();
-		search_random_file_test(test_registers);
-		end_2 = std::chrono::steady_clock::now();
-		duration_2 = std::chrono::duration_cast<std::chrono::milliseconds>(end_2 - start_2).count();
-		results << duration_2 << ',';
+    start_2 = std::chrono::steady_clock::now();
+    search_random_file_test(test_registers);
+    end_2 = std::chrono::steady_clock::now();
+    duration_2 =
+        std::chrono::duration_cast<std::chrono::milliseconds>(end_2 - start_2)
+            .count();
+    results << duration_2 << ',';
 
-		//Time for DynamicHash
-		auto start_3 = std::chrono::steady_clock::now();
-		insert_dyn_hash_test(test_registers);
-		auto end_3 = std::chrono::steady_clock::now();
-		auto duration_3 = std::chrono::duration_cast<std::chrono::milliseconds>(end_3 - start_3).count();
-		results << duration_3 << ',';
+    start = std::chrono::steady_clock::now();
+    rsearch_random_file_test(test_registers);
+    end = std::chrono::steady_clock::now();
+    duration =
+        std::chrono::duration_cast<std::chrono::milliseconds>(end - start)
+            .count();
+    results << duration << ',';
 
-		start_3 = std::chrono::steady_clock::now();
-		search_dyn_hash_test(test_registers);
-		end_3 = std::chrono::steady_clock::now();
-		duration_3 = std::chrono::duration_cast<std::chrono::milliseconds>(end_3 - start_3).count();
-		results << duration_3 << std::endl;
-	}
+    // Time for DynamicHash
+    auto start_3 = std::chrono::steady_clock::now();
+    insert_dyn_hash_test(test_registers);
+    auto end_3 = std::chrono::steady_clock::now();
+    auto duration_3 =
+        std::chrono::duration_cast<std::chrono::milliseconds>(end_3 - start_3)
+            .count();
+    results << duration_3 << ',';
 
-	results.close();
+    start_3 = std::chrono::steady_clock::now();
+    search_dyn_hash_test(test_registers);
+    end_3 = std::chrono::steady_clock::now();
+    duration_3 =
+        std::chrono::duration_cast<std::chrono::milliseconds>(end_3 - start_3)
+            .count();
+    results << duration_3 << std::endl;
 
-	return 0; 
+    start = std::chrono::steady_clock::now();
+    rsearch_dyn_hash_test(test_registers);
+    end = std::chrono::steady_clock::now();
+    duration =
+        std::chrono::duration_cast<std::chrono::milliseconds>(end - start)
+            .count();
+    results << duration << ',';
+  }
+
+  results.close();
+
+  return 0;
 }
