@@ -21,8 +21,10 @@ int main(int argc, char** argv) {
 		case 0:
 			{
 			DinHash<Person, 10> dh(5, hash_file);
-			Person t = dh.search(dni).value();
-			std::cout << t << std::endl;
+			auto vec = dh.get_all();
+			for(auto e : vec){
+				std::cout << e << std::endl;
+			}
 			break;
 			}
 		case 1:
