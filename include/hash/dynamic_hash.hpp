@@ -36,6 +36,7 @@ class DinHash {
 	private:
 		using Bucket = BaseBucket<T, fd>;
 		std::string filename;
+		std::string indexfile;
 		int max_depth;
 		std::set<int> index;
 		int disk_acceses = 0;
@@ -47,17 +48,34 @@ class DinHash {
 	public:
 		DinHash(int max_depth, const std::string &filename)
 				: max_depth(max_depth), filename(filename) {
-			std::ofstream out_stream(filename, std::ios::binary | std::ios::trunc);
 
-			Bucket b0(0);
-			Bucket b1(0);
-			write_bucket(0, b0);
-			write_bucket(1, b1);
+			indexfile = filename + ".aux";
+			if (exists(filename)) {
+				std::ifstream in_stream(indexfile, std::ios::binary);
 
-			index.insert(0);
-			index.insert(1);
+				int key;
+				while (true) {
+					in_stream.read((char *) &key, sizeof key);
 
-			out_stream.close();
+					if (in_stream.eof()) {
+						break;
+					}
+
+					index.insert(key);
+				}
+			}
+			else {
+				std::ofstream out_stream(filename, std::ios::binary);
+				Bucket b0(0);
+				Bucket b1(0);
+				write_bucket(0, b0);
+				write_bucket(1, b1);
+
+				index.insert(0);
+				index.insert(1);
+				out_stream.close();
+			}
+
 		}
 
 		int get_disk_access(){
@@ -67,6 +85,14 @@ class DinHash {
 		std::optional<T> search(int key);
 		std::vector<T> range_search(int start_key, int end_key); 
 		bool split_bucket(int hash);
+
+		~DinHash() {
+			std::ofstream out_stream(indexfile, std::ios::binary);
+			for (int hash : index) {
+				out_stream.write((char *) &hash, sizeof hash);
+			}
+			out_stream.close();
+		}
 };
 
 template <class T, int fd>
@@ -104,7 +130,7 @@ std::optional<T> BaseBucket<T, fd>::search(int key) {
 template <class T, int fd> 
 typename DinHash<T, fd>::Bucket DinHash<T, fd>::read_bucket(int hash) {
 	std::ifstream in_stream(filename, std::ios::binary | std::ios::in);
-	in_stream.seekg(hash * sizeof(Bucket) + sizeof(int), std::ios::beg);
+	in_stream.seekg(hash * sizeof(Bucket), std::ios::beg);
 	Bucket b;
 	in_stream.read((char*) &b, sizeof(Bucket));
 	in_stream.close();
@@ -115,7 +141,7 @@ typename DinHash<T, fd>::Bucket DinHash<T, fd>::read_bucket(int hash) {
 template <class T, int fd>
 void DinHash<T, fd>::write_bucket(int hash, Bucket b) {
 	std::fstream out_stream(filename);
-	out_stream.seekp(hash * sizeof(Bucket) + sizeof(int), std::ios::beg);
+	out_stream.seekp(hash * sizeof(Bucket), std::ios::beg);
 	out_stream.write((char*)&b, sizeof(Bucket));
 	out_stream.close();
 	disk_acceses++;
