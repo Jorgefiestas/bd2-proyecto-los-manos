@@ -51,7 +51,7 @@ int rsearch_btree_test(std::vector<Person> &vec) {
 }
 
 int insert_dyn_hash_test(std::vector<Person> &vec) {
-  DinHash<Person, 10> dhash(5, "test/data_hash" + std::to_string(t) + ".bin");
+  DinHash<Person, 50> dhash(10, "test/data_hash" + std::to_string(t) + ".bin");
 
   for (Person &p : vec) {
     dhash.insert(p.dni, p);
@@ -60,15 +60,22 @@ int insert_dyn_hash_test(std::vector<Person> &vec) {
 }
 
 int search_dyn_hash_test(std::vector<Person> &vec) {
-  DinHash<Person, 10> dhash(5, "test/data_hash" + std::to_string(t) + ".bin");
+  DinHash<Person, 50> dhash(10, "test/data_hash" + std::to_string(t) + ".bin");
 
+  int cnt = 0;
   for (Person &p : vec) {
-    dhash.search(p.dni);
+    auto obj = dhash.search(p.dni);
+	if (obj) {
+		Person p2 = obj.value();
+		assert(p.age == p2.age);
+		cnt++;
+	}
   }
+
 	return dhash.get_disk_access();
 }
 int rsearch_dyn_hash_test(std::vector<Person> &vec) {
-  DinHash<Person, 10> dhash(5, "test/data_hash" + std::to_string(t) + ".bin");
+  DinHash<Person, 50> dhash(10, "test/data_hash" + std::to_string(t) + ".bin");
 
   dhash.range_search(vec[0].dni, vec[0].dni + 10000);
 	return dhash.get_disk_access();
